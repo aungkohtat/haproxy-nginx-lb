@@ -1,0 +1,68 @@
+version: '3'
+ 
+services:
+    nginx_web_1:
+        container_name: nginx_web_1
+        build: ./nginx/web1
+        expose:
+            - 80
+        networks:
+            public_net:
+                ipv4_address: 172.16.0.10
+                aliases: 
+                    - nginx1
+    nginx_web_2:
+        container_name: nginx_web_2
+        build: ./nginx/web2
+        expose:
+            - 80
+        networks:
+            public_net:
+                ipv4_address: 172.16.0.20
+                aliases: 
+                    - nginx2
+    nginx_web_3:
+        container_name: nginx_web_3
+        build: ./nginx/web3
+        expose:
+            - 80
+        networks:
+            public_net:
+                ipv4_address: 172.16.0.30
+                aliases: 
+                    - nginx3
+    haproxy1:
+        build: ./haproxy
+        ports:
+            - 80:80
+        expose:
+            - 80
+        networks:
+            public_net:
+                ipv4_address: 172.16.0.2
+        environment:
+            - NGINX_1_IP=172.16.0.10
+            - NGINX_2_IP=172.16.0.20
+            - NGINX_3_IP=172.16.0.30
+            - NGINX_EXPOSED_PORT=80
+    haproxy2:
+        build: ./haproxy
+        ports:
+            - 8081:80
+        expose:
+            - 80
+        networks:
+            public_net:
+                ipv4_address: 172.16.0.3
+        environment:
+            - NGINX_1_IP=172.16.0.10
+            - NGINX_2_IP=172.16.0.20
+            - NGINX_3_IP=172.16.0.30
+            - NGINX_EXPOSED_PORT=80
+networks:
+    public_net:
+        driver: bridge
+        ipam:
+            driver: default
+            config:
+                - subnet: 172.16.0.0/24
